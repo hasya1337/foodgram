@@ -1,0 +1,38 @@
+[
+    {
+      "name": "завтрак",
+      "slug": "breakfast"
+    },
+    {
+      "name": "обед",
+      "slug": "lunch"
+    },
+    {
+      "name": "ужин",
+      "slug": "dinner"
+    },
+    {
+      "name": "выпечка",
+      "slug": "pastries"
+    },
+    {
+      "name": "суп",
+      "slug": "soup"
+    },
+    {
+      "name": "десерт",
+      "slug": "dessert"
+    },
+    {
+      "name": "торт",
+      "slug": "cake"
+    },
+    {
+      "name": "быстрое",
+      "slug": "quick"
+    },
+    {
+      "name": "детское",
+      "slug": "baby"
+    }
+  ]
