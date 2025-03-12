@@ -5,7 +5,7 @@ django-filter==2.4.0
 djoser==2.1.0
 drf-extra-fields
 gunicorn==20.1.0
-psycopg2-binary==2.9.3
+psycopg2-binary==2.9.10
 Pillow==11.1.0
 pytest==6.2.4
 pytest-django==4.4.0
