@@ -13,7 +13,7 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
   backend:
-    image: hasya1337/foodgram_backend
+    image: reycode/foodgram_backend
     env_file: .env
     volumes:
       - static:/static
@@ -23,12 +23,12 @@ services:
       - db
   frontend:
     env_file: .env
-    image: hasya1337/foodgram_frontend
+    image: reycode/foodgram_frontend
     command: cp -r /app/build/. /static/
     volumes:
       - static:/static
   gateway:
-    image: hasya1337/foodgram_gateway
+    image: reycode/foodgram_gateway
     env_file: .env
     ports:
       - 8080:80
