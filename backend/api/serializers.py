@@ -40,7 +40,7 @@ class FoodgramUserSerializer(UserSerializer):
     def get_is_subscribed(self, author):
         request = self.context['request']
         return (
-            request.user.is_authenticated and author.subscribers.filter(
+            request.user.is_authenticated and author.follower.filter(
                 follower=request.user
             ).exists()
         )
