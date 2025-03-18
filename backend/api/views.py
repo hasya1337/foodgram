@@ -200,7 +200,7 @@ class FoodgramUserViewSet(UserViewSet):
             paginated_subs,
             context={'request': request},
             many=True
-            ).data
+        ).data
         )
 
     @action(
