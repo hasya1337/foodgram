@@ -134,9 +134,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def get_link(self, request, pk):
         return Response(
-            {'short-link': request.build_absolute_uri(reverse(
-                "recipes:short_link",
-                args=[pk]))
+            {
+                'short-link': request.build_absolute_uri(reverse(
+                    "recipes:short_link",
+                    args=[pk])
+                )
             },
             status=status.HTTP_200_OK)
 
