@@ -65,14 +65,26 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def manage_favorite_or_cart(pk, model, request, action):
         recipe = get_object_or_404(Recipe, id=pk)
         if action == 'add':
-            item, created = model.objects.get_or_create(user=request.user, recipe=recipe)
+            item, created = model.objects.get_or_create(
+                user=request.user,
+                recipe=recipe
+            )
             if not created:
-                raise ValidationError(f'Данный рецепт уже в {model._meta.verbose_name}!')
-            return Response(SmallRecipeSerializer(item.recipe).data, status=status.HTTP_201_CREATED)
+                raise ValidationError(
+                    f'Данный рецепт уже в {model._meta.verbose_name}!'
+                )
+            return Response(
+                SmallRecipeSerializer(item.recipe).data,
+                status=status.HTTP_201_CREATED
+            )
         get_object_or_404(model, user=request.user, recipe=recipe).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    @action(
+        detail=True,
+        methods=['post'],
+        permission_classes=[permissions.IsAuthenticated]
+    )
     def favorite(self, request, pk):
         return self.manage_favorite_or_cart(pk, Favorite, request, 'add')
 
@@ -80,7 +92,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def favorite_delete(self, request, pk):
         return self.manage_favorite_or_cart(pk, Favorite, request, 'delete')
 
-    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    @action(
+        detail=True,
+        methods=['post'],
+        permission_classes=[permissions.IsAuthenticated]
+    )
     def shopping_cart(self, request, pk):
         return self.manage_favorite_or_cart(pk, ShopingCart, request, 'add')
 
@@ -88,11 +104,20 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def shopping_cart_delete(self, request, pk):
         return self.manage_favorite_or_cart(pk, ShopingCart, request, 'delete')
 
-    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    @action(
+        detail=False,
+        methods=['get'],
+        permission_classes=[permissions.IsAuthenticated]
+    )
     def download_shopping_cart(self, request):
         recipes = request.user.shopping_cart.values_list('recipe', flat=True)
-        recipes_names = request.user.shopping_cart.values_list('recipe__name', flat=True)
-        ingredients = RecipeIngredient.objects.filter(recipe__in=recipes).values(
+        recipes_names = request.user.shopping_cart.values_list(
+            'recipe__name',
+            flat=True
+        )
+        ingredients = RecipeIngredient.objects.filter(
+            recipe__in=recipes
+        ).values(
             'ingredient__name', 'ingredient__measurement_unit'
         ).annotate(amount=Sum('amount')).order_by('ingredient__name')
         return FileResponse(
@@ -101,11 +126,19 @@ class RecipeViewSet(viewsets.ModelViewSet):
             filename='cart.txt'
         )
 
-    @action(detail=True, methods=['get'], url_path='get-link', permission_classes=[permissions.AllowAny])
+    @action(
+        detail=True,
+        methods=['get'],
+        url_path='get-link',
+        permission_classes=[permissions.AllowAny]
+    )
     def get_link(self, request, pk):
-        recipe = get_object_or_404(Recipe, id=pk)
-        return Response({'short-link': request.build_absolute_uri(reverse("recipes:short_link", args=[pk]))},
-                        status=status.HTTP_200_OK)
+        return Response(
+            {'short-link': request.build_absolute_uri(reverse(
+                "recipes:short_link",
+                 args=[pk]))
+            },
+            status=status.HTTP_200_OK)
 
 
 class FoodgramUserViewSet(UserViewSet):
@@ -119,14 +152,26 @@ class FoodgramUserViewSet(UserViewSet):
             return [IsAuthenticated()]
         return super().get_permissions()
 
-    @action(detail=False, url_path='me/avatar', methods=['put'], permission_classes=[IsAuthenticated])
+    @action(
+        detail=False,
+        url_path='me/avatar',
+        methods=['put'],
+        permission_classes=[IsAuthenticated]
+    )
     def avatar(self, request):
         if 'avatar' not in request.data:
             raise ValidationError('Отсутствует файл!')
-        serializer = self.get_serializer(request.user, data=request.data, partial=True)
+        serializer = self.get_serializer(
+            request.user,
+            data=request.data,
+            partial=True
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({'avatar': serializer.data['avatar']}, status=status.HTTP_200_OK)
+        return Response(
+            {'avatar': serializer.data['avatar']},
+            status=status.HTTP_200_OK
+        )
 
     @avatar.mapping.delete
     def avatar_delete(self, request):
@@ -137,21 +182,45 @@ class FoodgramUserViewSet(UserViewSet):
         request.user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    @action(
+        detail=False,
+        methods=['get'],
+        permission_classes=[IsAuthenticated]
+    )
     def subscriptions(self, request):
         subscriptions = request.user.followers.values_list('author', flat=True)
-        paginated_subs = self.paginate_queryset(User.objects.filter(id__in=subscriptions))
-        return self.get_paginated_response(UserSubscribingSerializer(paginated_subs, context={'request': request}, many=True).data)
+        paginated_subs = self.paginate_queryset(
+            User.objects.filter(
+                id__in=subscriptions
+            )
+        )
+        return self.get_paginated_response(UserSubscribingSerializer(
+            paginated_subs,
+            context={'request': request},
+            many=True
+            ).data
+        )
 
-    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    @action(
+        detail=True,
+        methods=['post'],
+        permission_classes=[IsAuthenticated]
+    )
     def subscribe(self, request, id):
         author = get_object_or_404(User, id=id)
-        serializer = UserSubscribingSerializer(data={'author': author}, context={'request': request})
+        serializer = UserSubscribingSerializer(
+            data={'author': author},
+            context={'request': request}
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save(follower=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @subscribe.mapping.delete
     def subscribe_delete(self, request, id):
-        get_object_or_404(Subscription, follower=request.user, author_id=id).delete()
+        get_object_or_404(
+            Subscription,
+            follower=request.user,
+            author_id=id
+        ).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
