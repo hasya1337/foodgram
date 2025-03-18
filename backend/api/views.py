@@ -136,7 +136,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Response(
             {'short-link': request.build_absolute_uri(reverse(
                 "recipes:short_link",
-                 args=[pk]))
+                args=[pk]))
             },
             status=status.HTTP_200_OK)
 
@@ -198,8 +198,8 @@ class FoodgramUserViewSet(UserViewSet):
             paginated_subs,
             context={'request': request},
             many=True
-            ).data
-        )
+        ).data
+                                           )
 
     @action(
         detail=True,
