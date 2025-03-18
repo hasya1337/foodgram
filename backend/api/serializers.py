@@ -211,7 +211,7 @@ class UserSubscribingSerializer(FoodgramUserSerializer):
         recipes_limit = int(request.query_params.get(
             'recipes_limit',
             MAXIMAL_AMOUNT
-            )
+        )
         )
         return SmallRecipeSerializer(
             author.recipes.all()[:recipes_limit],
