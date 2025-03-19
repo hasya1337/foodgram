@@ -212,7 +212,10 @@ class FoodgramUserViewSet(UserViewSet):
         author = get_object_or_404(User, id=id)
 
         if request.user == author:
-            return Response({'error': 'Нельзя подписаться на самого себя!'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'error': 'Нельзя подписаться на самого себя!'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         subscription, created = Subscription.objects.get_or_create(
             follower=request.user,
@@ -220,7 +223,10 @@ class FoodgramUserViewSet(UserViewSet):
         )
 
         if not created:
-            return Response({'error': 'Вы уже подписаны на этого пользователя!'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'error': 'Вы уже подписаны на этого пользователя!'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         serializer = UserSubscribingSerializer(
             author, context={'request': request}
