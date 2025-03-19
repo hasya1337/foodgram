@@ -118,6 +118,20 @@ class RecipeSerializer(serializers.ModelSerializer):
             for ingredient in ingredients
         ])
 
+    @staticmethod
+    def fields_validation(data, message):
+        if not data:
+            raise serializers.ValidationError(f'Отсутствуют {message}ы!')
+        items = set()
+        for item in data:
+            if isinstance(item, dict):
+                item = item['ingredient']
+            if item in items:
+                raise serializers.ValidationError(
+                    f'Дублируется {message} {item.name}!')
+            items.add(item)
+        return data
+
     def create(self, validated_data):
         ingredients = validated_data.pop('recipe_ingredients', [])
         tags = validated_data.pop('tags', [])
