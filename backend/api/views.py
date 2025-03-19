@@ -210,12 +210,21 @@ class FoodgramUserViewSet(UserViewSet):
     )
     def subscribe(self, request, id):
         author = get_object_or_404(User, id=id)
-        serializer = UserSubscribingSerializer(
-            data={'author': author},
-            context={'request': request}
+
+        if request.user == author:
+            return Response({'error': 'Нельзя подписаться на самого себя!'}, status=status.HTTP_400_BAD_REQUEST)
+
+        subscription, created = Subscription.objects.get_or_create(
+            follower=request.user,
+            author=author
         )
-        serializer.is_valid(raise_exception=True)
-        serializer.save(follower=request.user)
+
+        if not created:
+            return Response({'error': 'Вы уже подписаны на этого пользователя!'}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = UserSubscribingSerializer(
+            author, context={'request': request}
+        )
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @subscribe.mapping.delete
