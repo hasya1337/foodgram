@@ -16,7 +16,8 @@ from recipes.models import (
     Recipe,
     RecipeIngredient,
     ShopingCart,
-    Tag
+    Tag,
+    Subscription
 )
 
 User = get_user_model()
@@ -38,10 +39,12 @@ class FoodgramUserSerializer(UserSerializer):
         return username
 
     def get_is_subscribed(self, author):
-        request = self.context['request']
+        request = self.context.get('request')
         return (
-            request.user.is_authenticated and author.followers.filter(
-                follower=request.user
+            request is not None
+            and request.user.is_authenticated
+            and Subscription.objects.filter(
+                follower=request.user, author=author
             ).exists()
         )
 
